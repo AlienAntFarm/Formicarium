@@ -10,8 +10,8 @@ $(iso):
 
 run.virsh: clean.virsh clean.volumes
 	@sudo virt-install --name $(vm_name) --memory 1024 --virt-type kvm \
-		--cdrom $(iso) --network network=default --disk size=10 \
-		--noautoconsole
+		--cdrom $(iso) --network bridge=virbr0,model=virtio \
+		--disk size=10 --noautoconsole
 	@sudo virsh console --domain $(vm_name)
 
 clean.virsh:
