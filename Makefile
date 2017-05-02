@@ -36,7 +36,6 @@ go_lxc_files = \
 		go/src/$(go_lxc)/lxc-binding.c \
 
 go/pkg/$(GOOS)_$(GOARCH)/$(go_lxc): $(go_lxc_pkg)
-	mkdir -p $(dir $@)
 	sudo $(GOPATH) go install $(go_lxc)
 
 go/src/%:
