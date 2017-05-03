@@ -3,3 +3,4 @@ bin/*
 pkg/*
 !pkg/.gitkeep
 src/gopkg.in/lxc
+src/github.com/golang
