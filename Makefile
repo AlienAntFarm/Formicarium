@@ -1,6 +1,6 @@
-.PHONY: run.virsh clean.virsh clean $(go_lxc_pkg) init
+.PHONY: clean clean-dist clean-virsh init run
 
-GOPATH = GOPATH=$(CURDIR)/go
+GOPATH = GOPATH=$(CURDIR)/colony
 GOOS ?= $(shell go env GOOS)
 GOARCH ?= $(shell go env GOARCH)
 
@@ -10,17 +10,19 @@ iso ?= alpine-virt-3.5.2-$(arch).iso
 iso_url = https://nl.alpinelinux.org/alpine/v3.5/releases/$(arch)/$(iso)
 
 go_lxc = gopkg.in/lxc/go-lxc.v2
+go_lxc_path = colony/src/$(go_lxc)
+go_alien_path = colony/src/github.com/alienantfarm
 
 $(iso):
 	wget $(iso_url)
 
-run.virsh: clean.virsh
+run: clean-virsh
 	@virt-install --name $(vm_name) --memory 1024 --virt-type kvm \
 		--cdrom $(iso) --network bridge=virbr0,model=virtio \
 		--disk size=10 --noautoconsole
 	@virsh console --domain $(vm_name)
 
-clean.virsh:
+clean-virsh:
 	@virsh list | \
 		awk '$$2 ~ /$(vm_name)/ {system("virsh destroy " $$2)}'
 	@virsh list --all | \
@@ -29,17 +31,23 @@ clean.virsh:
 		'NR > 2 && NF > 0 {system("xargs virsh vol-delete --pool default " $$1)}'
 
 go_lxc_files = \
-		$(wildcard go/src/$(go_lxc)/*.go) \
-		go/src/$(go_lxc)/lxc-binding.h \
-		go/src/$(go_lxc)/lxc-binding.c \
+		$(wildcard $(go_lxc_path)/*.go) \
+		$(go_lxc_path)/lxc-binding.h \
+		$(go_lxc_path)/lxc-binding.c \
 
-go/pkg/$(GOOS)_$(GOARCH)/$(go_lxc): $(go_lxc_pkg)
+colony/pkg/$(GOOS)_$(GOARCH)/$(go_lxc): $(go_lxc_path)
 	sudo $(GOPATH) go install $(go_lxc)
 
-go/src/%:
-	$(GOPATH) go get -d $(subst go/src/,,$@)
+colony/src/%:
+	$(GOPATH) go get -d $(subst colony/src/,,$@)
 
-init: go/src/$(go_lxc)
+$(go_alien_path)/%:
+	git clone git@github.com:alienantfarm/$(notdir $@) $@
 
+init: $(go_lxc_path) $(go_alien_path)/anthive $(go_alien_path)/antling
+
+clean-dist: clean
+	rm -rf $(wildcard colony/src/*)
 clean:
-	rm -f $(wildcard go/bin/*)
+	rm -f $(wildcard colony/bin/*)
+	rm -rf $(wildcard colony/pkg/*)

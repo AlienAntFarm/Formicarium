@@ -1,5 +1,0 @@
-bin/*
-!bin/.gitkeep
-pkg/*
-!pkg/.gitkeep
-src/gopkg.in/lxc
