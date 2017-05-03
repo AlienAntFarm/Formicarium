@@ -1,4 +1,4 @@
-.PHONY: clean.volumes clean.virsh clean $(go_lxc_pkg)
+.PHONY: run.virsh clean.virsh clean $(go_lxc_pkg) init
 
 GOPATH = GOPATH=$(CURDIR)/go
 GOOS ?= $(shell go env GOOS)
@@ -14,7 +14,7 @@ go_lxc = gopkg.in/lxc/go-lxc.v2
 $(iso):
 	wget $(iso_url)
 
-run.virsh: clean.virsh clean.volumes
+run.virsh: clean.virsh
 	@virt-install --name $(vm_name) --memory 1024 --virt-type kvm \
 		--cdrom $(iso) --network bridge=virbr0,model=virtio \
 		--disk size=10 --noautoconsole
@@ -25,8 +25,6 @@ clean.virsh:
 		awk '$$2 ~ /$(vm_name)/ {system("virsh destroy " $$2)}'
 	@virsh list --all | \
 		awk '$$2 ~ /$(vm_name)/ {system("virsh undefine " $$2)}'
-
-clean.volumes:
 	@virsh vol-list default | awk \
 		'NR > 2 && NF > 0 {system("xargs virsh vol-delete --pool default " $$1)}'
 
@@ -41,5 +39,7 @@ go/pkg/$(GOOS)_$(GOARCH)/$(go_lxc): $(go_lxc_pkg)
 go/src/%:
 	$(GOPATH) go get -d $(subst go/src/,,$@)
 
+init: go/src/$(go_lxc)
 
-clean: clean.virsh clean.volumes
+clean:
+	rm -f $(wildcard go/bin/*)
