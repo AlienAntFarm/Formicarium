@@ -10,8 +10,8 @@ iso ?= alpine-virt-3.5.2-$(arch).iso
 iso_url = https://nl.alpinelinux.org/alpine/v3.5/releases/$(arch)/$(iso)
 
 go_lxc = gopkg.in/lxc/go-lxc.v2
-go_lxc_path = colony/src/$(go_lxc)
-go_alien_path = colony/src/github.com/alienantfarm
+go_lxc_path = $(GOPATH)/src/$(go_lxc)
+go_alien_path = $(GOPATH)/src/github.com/alienantfarm
 
 $(iso):
 	wget $(iso_url)
@@ -35,11 +35,11 @@ go_lxc_files = \
 		$(go_lxc_path)/lxc-binding.h \
 		$(go_lxc_path)/lxc-binding.c \
 
-colony/pkg/$(GOOS)_$(GOARCH)/$(go_lxc): $(go_lxc_path)
+$(GOPATH)/pkg/$(GOOS)_$(GOARCH)/$(go_lxc): $(go_lxc_path)
 	sudo $(GOPATH) go install $(go_lxc)
 
-colony/src/%:
-	$(GOPATH) go get -d $(subst colony/src/,,$@)
+$(GOPATH)/src/%:
+	$(GOPATH) go get -d $(subst $(GOPATH)/src/,,$@)
 
 $(go_alien_path)/%:
 	git clone git@github.com:alienantfarm/$(notdir $@) $@
@@ -47,7 +47,7 @@ $(go_alien_path)/%:
 init: $(go_lxc_path) $(go_alien_path)/anthive $(go_alien_path)/antling
 
 clean-dist: clean
-	rm -rf $(wildcard colony/src/*)
+	rm -rf $(wildcard $(GOPATH)/src/*)
 clean:
-	rm -f $(wildcard colony/bin/*)
-	rm -rf $(wildcard colony/pkg/*)
+	rm -f $(wildcard $(GOPATH)/bin/*)
+	rm -rf $(wildcard $(GOPATH)/pkg/*)
