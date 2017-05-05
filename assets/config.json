@@ -6,7 +6,7 @@
     "database": {
         "name": "hatchery",
         "user": "hatchery",
-        "host": "localhost",
+        "host": "hatchery",
         "port": 5432,
         "password": "some_password"
     },

@@ -1,0 +1,21 @@
+version: '2'
+services:
+  hatchery:
+    container_name: alienantfarm_hatchery
+    build:
+      context: .
+      dockerfile: dockerfiles/hatchery
+  anthive:
+    container_name: alienantfarm_anthive
+    build:
+      context: .
+      dockerfile: dockerfiles/anthive
+    links:
+      - hatchery
+  anthivectl:
+    container_name: alienantfarm_anthivectl
+    build:
+      context: .
+      dockerfile: dockerfiles/anthivectl
+    links:
+      - hatchery

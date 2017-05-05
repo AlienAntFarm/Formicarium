@@ -6,7 +6,7 @@ ARG ANTHIVE_P=${GOPATH}/src/${ANTHIVE}
 
 COPY colony/src/${ANTHIVE} ${ANTHIVE_P}
 RUN apk add --no-cache -t buildeps go git make musl-dev \
-		&& mkdir -p ${GOPATH}
+		&& mkdir -p ${GOPATH} \
 		&& cd ${ANTHIVE_P} && go get ./... \
 		&& go build -ldflags '-w -s' -o /usr/local/bin/anthive ${ANTHIVE} \
 		&& rm -rf ${GOPATH} \

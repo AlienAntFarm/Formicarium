@@ -1,0 +1,16 @@
+FROM alpine:3.5
+
+ENV LANG en_US.utf8
+
+RUN apk add --no-cache postgresql
+
+WORKDIR /var/lib/postgresql
+ENV PGDATA=/var/lib/postgresql/data
+
+COPY assets/setup_db.sh .
+RUN su - postgres -c 'PGDATA='"${PGDATA}"' ./setup_db.sh' && rm setup_db.sh
+
+USER postgres
+VOLUME $PGDATA
+EXPOSE 5432
+CMD ["postgres", "-h", "*"]
