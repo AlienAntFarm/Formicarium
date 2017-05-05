@@ -1,6 +1,6 @@
 .PHONY: clean clean-dist clean-virsh init run
 
-GOPATH = GOPATH=$(CURDIR)/colony
+GOPATH = $(CURDIR)/colony
 GOOS ?= $(shell go env GOOS)
 GOARCH ?= $(shell go env GOARCH)
 
@@ -10,6 +10,7 @@ iso ?= alpine-virt-3.5.2-$(arch).iso
 iso_url = https://nl.alpinelinux.org/alpine/v3.5/releases/$(arch)/$(iso)
 
 go_lxc = gopkg.in/lxc/go-lxc.v2
+go_mux = github.com/gorilla/mux
 go_lxc_path = $(GOPATH)/src/$(go_lxc)
 go_alien_path = $(GOPATH)/src/github.com/alienantfarm
 
@@ -39,12 +40,12 @@ $(GOPATH)/pkg/$(GOOS)_$(GOARCH)/$(go_lxc): $(go_lxc_path)
 	sudo $(GOPATH) go install $(go_lxc)
 
 $(GOPATH)/src/%:
-	$(GOPATH) go get -d $(subst $(GOPATH)/src/,,$@)
+	go get -d $(subst $(GOPATH)/src/,,$@)
 
 $(go_alien_path)/%:
 	git clone git@github.com:alienantfarm/$(notdir $@) $@
 
-init: $(go_lxc_path) $(go_alien_path)/anthive $(go_alien_path)/antling
+init: $(GOPATH)/src/$(go_mux) $(go_lxc_path) $(go_alien_path)/anthive $(go_alien_path)/antling
 
 clean-dist: clean
 	rm -rf $(wildcard $(GOPATH)/src/*)
