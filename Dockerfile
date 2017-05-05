@@ -1,12 +1,15 @@
 FROM alpine:3.5
 
-ENV ANTHIVE github.com/alienantfarm/anthive
-ENV GOPATH /tmp
-COPY colony/src/${ANTHIVE} ${GOPATH}/src/${ANTHIVE}
+ARG GOPATH=/tmp/go
+ARG ANTHIVE=github.com/alienantfarm/anthive
+ARG ANTHIVE_P=${GOPATH}/src/${ANTHIVE}
 
-RUN apk add --no-cache -t buildeps go make musl-dev \
+COPY colony/src/${ANTHIVE} ${ANTHIVE_P}
+RUN apk add --no-cache -t buildeps go git make musl-dev \
+		&& mkdir -p ${GOPATH}
+		&& cd ${ANTHIVE_P} && go get ./... \
 		&& go build -ldflags '-w -s' -o /usr/local/bin/anthive ${ANTHIVE} \
-		&& rm -rf /tmp/anthive \
+		&& rm -rf ${GOPATH} \
 		&& apk del buildeps
 
 ENV ANTHIVE_CONFIG /etc/anthive/config.json
