@@ -9,9 +9,6 @@ arch ?= x86_64
 iso ?= alpine-virt-3.5.2-$(arch).iso
 iso_url = https://nl.alpinelinux.org/alpine/v3.5/releases/$(arch)/$(iso)
 
-go_lxc = gopkg.in/lxc/go-lxc.v2
-go_mux = github.com/gorilla/mux
-go_lxc_path = $(GOPATH)/src/$(go_lxc)
 go_alien_path = $(GOPATH)/src/github.com/alienantfarm
 
 $(iso):
@@ -31,21 +28,12 @@ clean-virsh:
 	@virsh vol-list default | awk \
 		'NR > 2 && NF > 0 {system("xargs virsh vol-delete --pool default " $$1)}'
 
-go_lxc_files = \
-		$(wildcard $(go_lxc_path)/*.go) \
-		$(go_lxc_path)/lxc-binding.h \
-		$(go_lxc_path)/lxc-binding.c \
-
-$(GOPATH)/pkg/$(GOOS)_$(GOARCH)/$(go_lxc): $(go_lxc_path)
-	sudo $(GOPATH) go install $(go_lxc)
-
-$(GOPATH)/src/%:
-	go get -d $(subst $(GOPATH)/src/,,$@)
-
 $(go_alien_path)/%:
 	git clone git@github.com:alienantfarm/$(notdir $@) $@
+	cd $@ && go get -d ./...
 
-init: $(GOPATH)/src/$(go_mux) $(go_lxc_path) $(go_alien_path)/anthive $(go_alien_path)/antling
+init: $(go_alien_path)/anthive $(go_alien_path)/antling
+
 
 clean-dist: clean
 	rm -rf $(wildcard $(GOPATH)/src/*)
