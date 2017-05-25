@@ -1,4 +1,5 @@
 debug = true
+dev = true
 host = "0.0.0.0"
 port = 8888
 url = ""
