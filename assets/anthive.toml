@@ -7,6 +7,13 @@ url = ""
 [database]
 name = "hatchery"
 user = "hatchery"
-host = "172.20.0.2"
+host = "172.20.0.3"
 port = 5432
 password = "some_password"
+
+[minio]
+host = "172.20.0.3"
+port = 9000
+user = "testing"
+password = "pikapika"
+ssl = false

@@ -12,6 +12,15 @@ services:
       dockerfile: dockerfiles/anthive
     links:
       - hatchery
+  incubator:
+    container_name: alienantfarm_anthive
+    image: minio/minio:RELEASE.2017-05-05T01-14-51Z
+    command: server /export
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+    ports:
+      - 9000:9000
   anthivectl:
     container_name: alienantfarm_anthivectl
     build:

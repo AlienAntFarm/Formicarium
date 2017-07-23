@@ -1,0 +1,6 @@
+#### DEFAULT CONFIGURATION #####
+
+id = 1
+debug = true
+dev = true
+anthive_url = "http://localhost:8888"
